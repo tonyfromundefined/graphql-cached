@@ -1,49 +1,49 @@
-import { queryType, inputObjectType, arg } from '@nexus/schema'
-import { USERS } from '../models'
+import { queryType, inputObjectType, arg } from "@nexus/schema";
+import { USERS } from "../models";
 
 export const Query = queryType({
   definition(t) {
-    t.boolean('ok', {
+    t.boolean("ok", {
       resolve() {
-        return true
+        return true;
       },
-    })
+    });
 
-    t.field('user', {
-      type: 'User',
+    t.field("user", {
+      type: "User",
       nullable: true,
       args: {
         where: arg({
-          type: 'UserWhereInput',
+          type: "UserWhereInput",
           required: true,
-        })
+        }),
       },
       resolve(_parent, args) {
-        return USERS.find((user) => user.id === args.where.id) || null
+        return USERS.find((user) => user.id === args.where.id) || null;
       },
-    })
+    });
 
-    t.list.field('users', {
-      type: 'User',
+    t.list.field("users", {
+      type: "User",
       resolve() {
-        return USERS
-      }
-    })
+        return USERS;
+      },
+    });
 
-    t.list.field('images', {
-      type: 'User',
+    t.list.field("images", {
+      type: "User",
       resolve() {
-        return USERS
-      }
-    })
-  }
-})
+        return USERS;
+      },
+    });
+  },
+});
 
 export const UserWhereInput = inputObjectType({
-  name: 'UserWhereInput',
+  name: "UserWhereInput",
   definition(t) {
-    t.string('id', {
+    t.string("id", {
       required: true,
-    })
-  }
-})
+    });
+  },
+});

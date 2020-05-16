@@ -1,14 +1,12 @@
 interface _Context {
   user?: {
-    id: string
-    role: 'Admin' | 'Staff' | 'User'
-  }
+    id: string;
+    role: "Admin" | "Staff" | "User";
+  };
 }
 
 declare global {
-  export type Context = _Context
+  export type Context = _Context;
 }
 
-export {
-  _Context as Context,
-}
+export { _Context as Context };

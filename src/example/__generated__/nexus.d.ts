@@ -3,25 +3,21 @@
  * Do not make changes to this file directly
  */
 
-import * as Image from "../models/Image"
-import * as User from "../models/User"
-
-
-
-
+import * as Image from "../models/Image";
+import * as User from "../models/User";
 
 declare global {
   interface NexusGen extends NexusGenTypes {}
 }
 
 export interface NexusGenInputs {
-  UserWhereInput: { // input type
+  UserWhereInput: {
+    // input type
     id: string; // String!
-  }
+  };
 }
 
-export interface NexusGenEnums {
-}
+export interface NexusGenEnums {}
 
 export interface NexusGenRootTypes {
   Image: Image.ModelImage;
@@ -35,36 +31,39 @@ export interface NexusGenRootTypes {
 }
 
 export interface NexusGenAllTypes extends NexusGenRootTypes {
-  UserWhereInput: NexusGenInputs['UserWhereInput'];
+  UserWhereInput: NexusGenInputs["UserWhereInput"];
 }
 
 export interface NexusGenFieldTypes {
-  Image: { // field return type
+  Image: {
+    // field return type
     id: string; // ID!
     url: string; // String!
-  }
-  Query: { // field return type
-    images: NexusGenRootTypes['User'][]; // [User!]!
+  };
+  Query: {
+    // field return type
+    images: NexusGenRootTypes["User"][]; // [User!]!
     ok: boolean; // Boolean!
-    user: NexusGenRootTypes['User'] | null; // User
-    users: NexusGenRootTypes['User'][]; // [User!]!
-  }
-  User: { // field return type
+    user: NexusGenRootTypes["User"] | null; // User
+    users: NexusGenRootTypes["User"][]; // [User!]!
+  };
+  User: {
+    // field return type
     id: string; // ID!
-    image: NexusGenRootTypes['Image'] | null; // Image
-  }
+    image: NexusGenRootTypes["Image"] | null; // Image
+  };
 }
 
 export interface NexusGenArgTypes {
   Query: {
-    user: { // args
-      where: NexusGenInputs['UserWhereInput']; // UserWhereInput!
-    }
-  }
+    user: {
+      // args
+      where: NexusGenInputs["UserWhereInput"]; // UserWhereInput!
+    };
+  };
 }
 
-export interface NexusGenAbstractResolveReturnTypes {
-}
+export interface NexusGenAbstractResolveReturnTypes {}
 
 export interface NexusGenInheritedFields {}
 
@@ -94,19 +93,28 @@ export interface NexusGenTypes {
   interfaceNames: NexusGenInterfaceNames;
   scalarNames: NexusGenScalarNames;
   unionNames: NexusGenUnionNames;
-  allInputTypes: NexusGenTypes['inputNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['scalarNames'];
-  allOutputTypes: NexusGenTypes['objectNames'] | NexusGenTypes['enumNames'] | NexusGenTypes['unionNames'] | NexusGenTypes['interfaceNames'] | NexusGenTypes['scalarNames'];
-  allNamedTypes: NexusGenTypes['allInputTypes'] | NexusGenTypes['allOutputTypes']
-  abstractTypes: NexusGenTypes['interfaceNames'] | NexusGenTypes['unionNames'];
+  allInputTypes:
+    | NexusGenTypes["inputNames"]
+    | NexusGenTypes["enumNames"]
+    | NexusGenTypes["scalarNames"];
+  allOutputTypes:
+    | NexusGenTypes["objectNames"]
+    | NexusGenTypes["enumNames"]
+    | NexusGenTypes["unionNames"]
+    | NexusGenTypes["interfaceNames"]
+    | NexusGenTypes["scalarNames"];
+  allNamedTypes:
+    | NexusGenTypes["allInputTypes"]
+    | NexusGenTypes["allOutputTypes"];
+  abstractTypes: NexusGenTypes["interfaceNames"] | NexusGenTypes["unionNames"];
   abstractResolveReturn: NexusGenAbstractResolveReturnTypes;
 }
 
-
 declare global {
-  interface NexusGenPluginTypeConfig<TypeName extends string> {
-  }
-  interface NexusGenPluginFieldConfig<TypeName extends string, FieldName extends string> {
-  }
-  interface NexusGenPluginSchemaConfig {
-  }
+  interface NexusGenPluginTypeConfig<TypeName extends string> {}
+  interface NexusGenPluginFieldConfig<
+    TypeName extends string,
+    FieldName extends string
+  > {}
+  interface NexusGenPluginSchemaConfig {}
 }

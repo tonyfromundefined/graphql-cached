@@ -1,13 +1,13 @@
-import { objectType } from '@nexus/schema'
+import { objectType } from "@nexus/schema";
 
 export const Image = objectType({
-  name: 'Image',
+  name: "Image",
   definition(t) {
-    t.id('id', {
+    t.id("id", {
       resolve(parent) {
-        return 'Image#' + parent.id
-      }
-    })
-    t.string('url')
-  }
-})
+        return "Image#" + parent.id;
+      },
+    });
+    t.string("url");
+  },
+});
