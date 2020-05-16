@@ -1,6 +1,6 @@
 import { ApolloServer } from 'apollo-server'
+import { cached } from 'graphql-cached'
 import { applyMiddleware } from 'graphql-middleware'
-import { cached } from 'graphql-middleware-cache'
 import Memcached from 'memcached'
 import path from 'path'
 
@@ -11,7 +11,7 @@ import { Context } from './context'
 import * as resolvers from './resolvers'
 import { createNexusTypegenSources } from './utils'
 
-const memcached = new Memcached('localhost:11212')
+const memcached = new Memcached('localhost:11211')
 
 memcached.flush(() => {
   console.log('Log: Cache is flushed')

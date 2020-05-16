@@ -1,7 +1,7 @@
 {
-  "name": "graphql-middleware-cache",
+  "name": "graphql-cached",
   "version": "1.0.0",
-  "repository": "https://github.com/tonyfromundefined/graphql-middleware-cache",
+  "repository": "https://github.com/tonyfromundefined/graphql-cached",
   "license": "MIT",
   "author": "tonyfromundefined <jeehyukwon@gmail.com>",
   "files": [
@@ -30,6 +30,6 @@
     "typescript": "^3.9.2"
   },
   "_moduleAliases": {
-    "graphql-middleware-cache": "./"
+    "graphql-cached": "./"
   }
 }

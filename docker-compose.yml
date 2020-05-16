@@ -1,8 +1,8 @@
 version: '3.7'
 
 services:
-  graphql-middleware-cache-example-memcached:
-    container_name: graphql-middleware-cache-example-memcached
+  graphql-cached-example-memcached:
+    container_name: graphql-cached-example-memcached
     image: memcached
     ports:
-      - '11212:11211'
+      - '11211:11211'
