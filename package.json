@@ -4,18 +4,19 @@
   "repository": "https://github.com/tonyfromundefined/graphql-middleware-cache",
   "license": "MIT",
   "author": "tonyfromundefined <jeehyukwon@gmail.com>",
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
   "files": [
     "/lib"
   ],
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
   "scripts": {
     "dev": "tsc-watch --onCompilationComplete \"node lib/example/index.js\"",
-    "postinstall": "link-module-alias"
+    "postinstall": "link-module-alias",
+    "prettier": "prettier . --write"
   },
   "dependencies": {
     "dataloader": "^2.0.0",
-    "graphql": "^15.0.0",
+    "graphql": "^14.5.8",
     "graphql-middleware": "^4.0.2",
     "memcached": "^2.2.2"
   },
@@ -25,7 +26,6 @@
     "apollo-server": "^2.13.1",
     "link-module-alias": "^1.2.0",
     "prettier": "^2.0.5",
-    "ts-toolbelt": "^6.7.7",
     "tsc-watch": "^4.2.5",
     "typescript": "^3.9.2"
   },

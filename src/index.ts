@@ -13,6 +13,50 @@ type TypeResolver = {
 }
 type FieldResolver = (parent: any, args: any, context: any, info: any) => any
 
+type Types<R> = {
+  [TypeName in keyof R]?: {
+    [FieldName in keyof R[TypeName]]?: {
+      /**
+       * Create a cache key by combining parent, args, and context.
+       * @param {Object} parent
+       * @param {Object} args
+       * @param {Object} context
+       * @param {Object} info
+       */
+      key: (
+        parent: Parameters<R[TypeName][FieldName]>[0],
+        args: Parameters<R[TypeName][FieldName]>[1],
+        context: Parameters<R[TypeName][FieldName]>[2],
+        info: Parameters<R[TypeName][FieldName]>[3]
+      ) => string
+
+      /**
+       * How much time to keep the cache (seconds)
+       */
+      lifetime: number
+
+      /**
+       * Preprocess item before storing in cache and after fetching from cache
+       */
+      serializer?: {
+        /**
+         * Preprocess item before storing it in the cache
+         * @param {Object} item
+         * @returns {Object} Serialized item
+         */
+        serialize(item: any): any
+
+        /**
+         * Preprocess item after fetching from cache
+         * @param {Object} Serialized item
+         * @returns {Object} Item
+         */
+        deserialize(serializedItem: any): any
+      }
+    }
+  }
+}
+
 export interface CacheConfiguration {
   /**
    * Memcached instance to use as cache storage
@@ -63,50 +107,6 @@ export interface CacheConfiguration {
 
 type ContextKeyFunction<Context> = (context: Context) => string
 type LifeCycleHook = (key: string, data: any | null) => void
-
-type Types<R> = {
-  [TypeName in keyof R]?: {
-    [FieldName in keyof R[TypeName]]?: {
-      /**
-       * Create a cache key by combining parent, args, and context.
-       * @param {Object} parent
-       * @param {Object} args
-       * @param {Object} context
-       * @param {Object} info
-       */
-      key: (
-        parent: Parameters<R[TypeName][FieldName]>[0],
-        args: Parameters<R[TypeName][FieldName]>[1],
-        context: Parameters<R[TypeName][FieldName]>[2],
-        info: Parameters<R[TypeName][FieldName]>[3]
-      ) => string
-
-      /**
-       * How much time to keep the cache (seconds)
-       */
-      lifetime: number
-
-      /**
-       * Preprocess item before storing in cache and after fetching from cache
-       */
-      serializer?: {
-        /**
-         * Preprocess item before storing it in the cache
-         * @param {Object} item
-         * @returns {Object} Serialized item
-         */
-        serialize(item: any): any
-
-        /**
-         * Preprocess item after fetching from cache
-         * @param {Object} Serialized item
-         * @returns {Object} Item
-         */
-        deserialize(serializedItem: any): any
-      }
-    }
-  }
-}
 
 export function cached<R extends Resolvers>(
   types: Types<Required<R>>,
