@@ -1,0 +1,32 @@
+{
+  "name": "graphql-middleware-cache",
+  "version": "1.0.0",
+  "repository": "https://github.com/tonyfromundefined/graphql-middleware-cache",
+  "license": "MIT",
+  "author": "tonyfromundefined <jeehyukwon@gmail.com>",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "/lib"
+  ],
+  "scripts": {
+    "dev": "tsc-watch --onCompilationComplete \"node lib/example/index.js\"",
+    "postinstall": "link-module-alias"
+  },
+  "dependencies": {
+    "graphql": "^15.0.0",
+    "graphql-middleware": "^4.0.2",
+    "memcached": "^2.2.2"
+  },
+  "devDependencies": {
+    "@nexus/schema": "^0.13.1",
+    "@types/memcached": "^2.2.6",
+    "apollo-server": "^2.13.1",
+    "link-module-alias": "^1.2.0",
+    "tsc-watch": "^4.2.5",
+    "typescript": "^3.9.2"
+  },
+  "_moduleAliases": {
+    "graphql-middleware-cache": "./"
+  }
+}
