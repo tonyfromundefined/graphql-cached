@@ -1,73 +1,91 @@
-import { ApolloServer } from "apollo-server";
-import { applyMiddleware } from "graphql-middleware";
-import { createCacheMiddleware } from "graphql-middleware-cache";
-import Memcached from "memcached";
-import path from "path";
+import { ApolloServer } from 'apollo-server'
+import { applyMiddleware } from 'graphql-middleware'
+import { cached } from 'graphql-middleware-cache'
+import Memcached from 'memcached'
+import path from 'path'
 
-import { makeSchema } from "@nexus/schema";
+import { FieldResolver, makeSchema } from '@nexus/schema'
 
-import __root from "./__root";
-import { Context } from "./context";
-import * as resolvers from "./resolvers";
-import { createNexusTypegenSources } from "./utils";
+import __root from './__root'
+import { Context } from './context'
+import * as resolvers from './resolvers'
+import { createNexusTypegenSources } from './utils'
 
-const memcached = new Memcached("localhost:11212");
+const memcached = new Memcached('localhost:11212')
 
 memcached.flush(() => {
-  console.log("Log: Cache is flushed");
-});
+  console.log('Log: Cache is flushed')
+})
 
 const schema = makeSchema({
   types: {
     resolvers,
   },
   outputs: {
-    schema: path.join(__root, "./src/example/__generated__/schema.graphql"),
-    typegen: path.join(__root, "./src/example/__generated__/nexus.d.ts"),
+    schema: path.join(__root, './src/example/__generated__/schema.graphql'),
+    typegen: path.join(__root, './src/example/__generated__/nexus.d.ts'),
   },
   typegenAutoConfig: {
-    contextType: "Context",
+    contextType: 'Context',
     sources: createNexusTypegenSources(),
   },
-});
+})
 
 const cachedSchema = applyMiddleware(
   schema,
-  createCacheMiddleware<Context>({
-    memcached,
-    contextKey(context) {
-      return "v1." + context.user?.role || "Anonymous";
-    },
-    fieldMap: {
-      "Query.user": {
-        lifetime: 10,
-        key(_parent: any, args: any) {
-          return JSON.stringify(args);
+  cached<{
+    Query?: {
+      user?: FieldResolver<'Query', 'user'>
+    }
+    User?: {
+      image?: FieldResolver<'User', 'image'>
+    }
+  }>(
+    {
+      Query: {
+        user: {
+          lifetime: 10,
+          key(_parent: any, args: any) {
+            return JSON.stringify(args)
+          },
         },
       },
-      "User.image": {
-        lifetime: 10,
-        key(parent) {
-          return parent.imageId;
+      User: {
+        image: {
+          lifetime: 5,
+          key(parent) {
+            return parent.imageId
+          },
         },
       },
     },
-    logger: true,
-  })
-);
+    {
+      memcached,
+      contextKey(context) {
+        return 'v1.' + context.user?.role || 'Anonymous'
+      },
+      logger: {
+        interval: 1000,
+      },
+      afterGet(key) {
+        console.log(key)
+      },
+    }
+  )
+)
 
 const server = new ApolloServer({
   schema: cachedSchema,
   context(): Context {
     return {
       user: {
-        id: "1",
-        role: "Admin",
+        id: '1',
+        role: 'Admin',
       },
-    };
+    }
   },
-});
+})
 
 server.listen().then(({ url }) => {
-  console.log(`GraphQL Middleware Cache Example Server ready at ${url}`);
-});
+  console.log(`GraphQL Middleware Cache Example Server ready at ${url}`)
+})

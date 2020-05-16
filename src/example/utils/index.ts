@@ -1,18 +1,18 @@
-import fs from "fs";
-import { GraphQLNamedType } from "graphql";
-import path from "path";
+import fs from 'fs'
+import { GraphQLNamedType } from 'graphql'
+import path from 'path'
 
-import { TypegenConfigSourceModule } from "@nexus/schema/dist/core";
+import { TypegenConfigSourceModule } from '@nexus/schema/dist/core'
 
-import __root from "../__root";
+import __root from '../__root'
 
 export function createNexusTypegenSources() {
-  const sources: TypegenConfigSourceModule[] = [];
+  const sources: TypegenConfigSourceModule[] = []
 
   try {
     const models = fs
-      .readdirSync(path.resolve(__root, "./src/example/models"))
-      .filter((model) => model !== "index.ts");
+      .readdirSync(path.resolve(__root, './src/example/models'))
+      .filter((model) => model !== 'index.ts')
 
     for (const model of models) {
       sources.push({
@@ -20,11 +20,11 @@ export function createNexusTypegenSources() {
         source: path.resolve(__root, `./src/example/models/${model}`),
         typeMatch: (type: GraphQLNamedType) =>
           new RegExp(`(?:class|type|interface)\\s+(Model${type.name})\\W`),
-      });
+      })
     }
 
-    return sources;
+    return sources
   } catch (error) {
-    return [];
+    return []
   }
 }
