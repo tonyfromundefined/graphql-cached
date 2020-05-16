@@ -1,4 +1,5 @@
 import { queryType, inputObjectType, arg } from "@nexus/schema";
+
 import { USERS } from "../models";
 
 export const Query = queryType({

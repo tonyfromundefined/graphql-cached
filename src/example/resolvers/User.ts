@@ -1,4 +1,5 @@
 import { objectType } from "@nexus/schema";
+
 import { IMAGES } from "../models";
 
 export const User = objectType({

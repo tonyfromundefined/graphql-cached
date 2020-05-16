@@ -1,7 +1,9 @@
-import { TypegenConfigSourceModule } from "@nexus/schema/dist/core";
 import fs from "fs";
 import { GraphQLNamedType } from "graphql";
 import path from "path";
+
+import { TypegenConfigSourceModule } from "@nexus/schema/dist/core";
+
 import __root from "../__root";
 
 export function createNexusTypegenSources() {

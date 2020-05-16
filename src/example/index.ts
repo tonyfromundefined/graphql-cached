@@ -1,13 +1,21 @@
-import { makeSchema } from "@nexus/schema";
 import { ApolloServer } from "apollo-server";
-import path from "path";
 import { applyMiddleware } from "graphql-middleware";
 import { createCacheMiddleware } from "graphql-middleware-cache";
-import * as resolvers from "./resolvers";
-import { createNexusTypegenSources } from "./utils";
+import Memcached from "memcached";
+import path from "path";
+
+import { makeSchema } from "@nexus/schema";
+
 import __root from "./__root";
 import { Context } from "./context";
-import Memcached from "memcached";
+import * as resolvers from "./resolvers";
+import { createNexusTypegenSources } from "./utils";
+
+const memcached = new Memcached("localhost:11212");
+
+memcached.flush(() => {
+  console.log("Log: Cache is flushed");
+});
 
 const schema = makeSchema({
   types: {
@@ -21,12 +29,6 @@ const schema = makeSchema({
     contextType: "Context",
     sources: createNexusTypegenSources(),
   },
-});
-
-const memcached = new Memcached("localhost:11212");
-
-memcached.flush(() => {
-  console.log("Log: Cache is flushed");
 });
 
 const cachedSchema = applyMiddleware(
