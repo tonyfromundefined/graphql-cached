@@ -28,7 +28,7 @@ export function cached<Context, Resolvers = ResolversBase>(
     }
   )
 
-  const middleware = async (
+  const resolveWithCache = async (
     resolve: any,
     parent: any,
     args: any,
@@ -73,16 +73,20 @@ export function cached<Context, Resolvers = ResolversBase>(
        */
       config.onHit?.(key, cachedItem)
 
-      return _fieldSerializer
-        ? _fieldSerializer.deserialize(cachedItem)
-        : cachedItem
+      let item = cachedItem
+
+      if (_fieldSerializer) {
+        item = _fieldSerializer.deserialize(cachedItem)
+      }
+
+      return item
     } else {
       /**
        * If cache miss, run `resolve` function and serialize it if serializer exists
        */
       config.onMiss?.(key, null)
 
-      const item = await resolve(parent, args, context)
+      const item = await resolve(parent, args, context, info)
       let serializedItem: object | undefined
 
       if (_fieldSerializer) {
@@ -100,15 +104,15 @@ export function cached<Context, Resolvers = ResolversBase>(
     }
   }
 
-  const middlewares: any = {}
+  const resolvers: any = {}
 
   for (const typeName of Object.keys(_t)) {
-    middlewares[typeName] = {}
+    resolvers[typeName] = {}
 
     for (const fieldName of Object.keys(_t[typeName])) {
-      middlewares[typeName][fieldName] = middleware
+      resolvers[typeName][fieldName] = resolveWithCache
     }
   }
 
-  return middlewares
+  return resolvers
 }
