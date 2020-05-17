@@ -1,6 +1,6 @@
 {
   "name": "graphql-cached",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Write a cache layer for each resolver in GraphQL Shield style with Memcached",
   "keywords": [
     "cache",
