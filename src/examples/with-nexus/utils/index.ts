@@ -15,16 +15,13 @@ export function createNexusTypegenSources() {
 
   try {
     const models = fs
-      .readdirSync(path.resolve(__root, './src/examples/with-nexus/models'))
+      .readdirSync(path.join(__root, './src/examples/common/models'))
       .filter((model) => model !== 'index.ts')
 
     for (const model of models) {
       sources.push({
         alias: path.parse(model).name,
-        source: path.resolve(
-          __root,
-          `./src/examples/with-nexus/models/${model}`
-        ),
+        source: path.join(__root, `./src/examples/common/models/${model}`),
         typeMatch: (type: GraphQLNamedType) =>
           new RegExp(`(?:class|type|interface)\\s+(Model${type.name})\\W`),
       })

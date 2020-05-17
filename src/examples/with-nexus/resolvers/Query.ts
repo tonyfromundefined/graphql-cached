@@ -4,12 +4,6 @@ import { IMAGES, USERS } from '../models'
 
 export const Query = queryType({
   definition(t) {
-    t.boolean('ok', {
-      resolve(parent, args, context) {
-        return true
-      },
-    })
-
     t.field('user', {
       type: 'User',
       nullable: true,

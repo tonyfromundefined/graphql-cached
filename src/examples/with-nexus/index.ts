@@ -4,11 +4,11 @@ import { applyMiddleware } from 'graphql-middleware'
 import Memcached from 'memcached'
 import path from 'path'
 
-import { FieldResolver, makeSchema } from '@nexus/schema'
+import { makeSchema } from '@nexus/schema'
 
+import { Context } from '../common/context'
 import { NexusGenFieldTypes } from './__generated__/nexus'
 import __root from './__root'
-import { Context } from './context'
 import * as resolvers from './resolvers'
 import {
   createNexusTypegenSources,

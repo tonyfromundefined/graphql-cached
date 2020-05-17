@@ -9,7 +9,6 @@ type Image {
 
 type Query {
   images: [Image!]!
-  ok: Boolean!
   user(where: UserWhereInput!): User
   users: [User!]!
 }

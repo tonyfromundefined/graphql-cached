@@ -3,8 +3,8 @@
  * Do not make changes to this file directly
  */
 
-import * as Image from "../models/Image"
-import * as User from "../models/User"
+import * as Image from "../../common/models/Image"
+import * as User from "../../common/models/User"
 
 
 
@@ -45,7 +45,6 @@ export interface NexusGenFieldTypes {
   }
   Query: { // field return type
     images: NexusGenRootTypes['Image'][]; // [Image!]!
-    ok: boolean; // Boolean!
     user: NexusGenRootTypes['User'] | null; // User
     users: NexusGenRootTypes['User'][]; // [User!]!
   }
