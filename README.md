@@ -61,33 +61,18 @@ const middleware = cached<Resolvers>(
 const cachedSchema = applyMiddleware(schema, middleware)
 ```
 
-## ⚠️⚠️ Be careful! ⚠️⚠️
+## Cache Field
 
-If there are resolvers with different responses for different users, carefully write the key generation function. Items cached for one user may be visible to other users.
+- TypeScript Definitions:
 
-Also, if there is a cached item, the existing resolver does not work. If you want to do permission-related logic before cache layer, I recommend using it with [graphql-shield](https://github.com/maticzav/graphql-shield).
+### Required
 
-```typescript
-const schemaWithMiddleware = applyMiddleware(
-  schema,
-  authMiddleware, // created with graphql-shield
-  cachedMiddleware // created with graphql-cached
-)
-```
+- `key`: `fieldKey` generation function
 
-> For more information on how GraphQL Middleware works, check out [GraphQL Middleware](https://github.com/prisma-labs/graphql-middleware).
+### Optional
 
-## Cache key generation method
-
-```
-{contextKey}${typeName}${fieldName}${fieldKey}
-```
-
-- Example
-
-  ```
-  v1.Admin$User$image$dbf66e27-9bb4-5682-b890-ecf34fe63333
-  ```
+- `lifetime`: How much time to keep the cache (seconds) (default: 10 seconds)
+- `serializer`: Preprocess item before storing in cache and after fetching from cache
 
 ## Configuration
 
@@ -105,7 +90,39 @@ const schemaWithMiddleware = applyMiddleware(
 - `onHit`: Triggered when cache hit
 - `onMiss`: Triggered when cache miss
 
-## Examples
+## Full cache key
+
+```
+{contextKey}${typeName}${fieldName}${fieldKey}
+```
+
+### Examples
+
+```
+v1.Admin$User$image$dbf66e27-9bb4-5682-b890-ecf34fe63333
+
+v1.User$Query$user${"where":{"id":"57c5fb3f-a5e7-5b4f-a7ed-ab50281b8222"}}
+```
+
+> ### ⚠️ Be careful!
+>
+> If there are resolvers with different responses for different users, carefully write the key generation function. Items cached for one user may be visible to other users.
+>
+> Also, if there is a cached item, the existing resolver does not work. If you want to do permission-related logic before cache layer, I recommend using it with [graphql-shield](https://github.com/maticzav/graphql-shield).
+>
+> ```typescript
+> const schemaWithMiddleware = applyMiddleware(
+>   schema,
+>   authMiddleware, // created with graphql-shield
+>   cachedMiddleware // created with graphql-cached
+> )
+> ```
+>
+> For more information on how GraphQL Middleware works, check out [GraphQL Middleware](https://github.com/prisma-labs/graphql-middleware).
+
+## Usage examples
 
 - [with-graphql-tools](./src/examples/with-graphql-tools)
 - [with-nexus](./src/examples/with-nexus)
+
+> If you have a feature request or a bug, please create a new issue. And also, pull requests are always welcome🙏
