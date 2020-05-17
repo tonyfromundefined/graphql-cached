@@ -1,6 +1,6 @@
 # ⚡️ GraphQL Cached
 
-Write a cache layer for each resolver in [GraphQL Shield](https://github.com/maticzav/graphql-shield) style.
+Write a cache layer for each resolver in [GraphQL Shield](https://github.com/maticzav/graphql-shield) style with Memcached
 
 ## Dependencies
 
