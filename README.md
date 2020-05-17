@@ -28,8 +28,9 @@ const memcached = new Memcached('my.memcached.host:11211')
 
 // Generated resolver types by `@graphql-codegen/cli`
 import { Resolvers } from './__generated__/resolvers'
+import { Context } from './context'
 
-const middleware = cached<Resolvers>(
+const middleware = cached<Context, Resolvers>(
   {
     User: {
       image: {

@@ -43,7 +43,7 @@ const schema = makeSchema({
 
 const cachedSchema = applyMiddleware(
   schema,
-  cached<ResolversFromNexusGenFieldTypes<NexusGenFieldTypes>, Context>(
+  cached<Context, ResolversFromNexusGenFieldTypes<NexusGenFieldTypes>>(
     {
       Query: {
         user: {

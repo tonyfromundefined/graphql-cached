@@ -29,7 +29,7 @@ const schema = makeExecutableSchema<Context>({
 
 const cachedSchema = applyMiddleware(
   schema,
-  cached<Resolvers, Context>(
+  cached<Context, Resolvers>(
     {
       Query: {
         user: {

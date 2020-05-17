@@ -2,11 +2,14 @@ import DataLoader from 'dataloader'
 import { GraphQLResolveInfo } from 'graphql'
 import { promisify } from 'util'
 
-import { CacheField, Config, T } from './types'
+import { CacheField, Config, ResolversBase, T } from './types'
 
 const DEFAULT_LIFETIME = 10
 
-export function cached<R, C>(t: T<Required<R>>, config: Config<C>) {
+export function cached<Context, Resolvers = ResolversBase>(
+  t: T<Required<Resolvers>>,
+  config: Config<Context>
+) {
   const _t: any = t
 
   /**
@@ -29,7 +32,7 @@ export function cached<R, C>(t: T<Required<R>>, config: Config<C>) {
     resolve: any,
     parent: any,
     args: any,
-    context: C,
+    context: Context,
     info: GraphQLResolveInfo
   ) => {
     const _typeName = info.parentType.toString()
