@@ -64,8 +64,6 @@ const cachedSchema = applyMiddleware(schema, middleware)
 
 ## Cache Field
 
-- TypeScript Definitions:
-
 ### Required
 
 - `key`: `fieldKey` generation function
