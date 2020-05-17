@@ -4,10 +4,7 @@ import { promisify } from 'util'
 
 import { CacheField, Config, ResolversBase, T } from './types'
 
-export function cached<R extends ResolversBase, C>(
-  t: T<Required<R>>,
-  config: Config<C>
-) {
+export function cached<R, C>(t: T<Required<R>>, config: Config<C>) {
   const _t: any = t
 
   /**

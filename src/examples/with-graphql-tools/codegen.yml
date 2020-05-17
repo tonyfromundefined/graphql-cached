@@ -1,0 +1,14 @@
+overwrite: true
+schema:
+  - ./src/examples/with-graphql-tools/schema.graphql
+generates:
+  ./src/examples/with-graphql-tools/__generated__/resolvers.ts:
+    config:
+      noNamespaces: true
+      contextType: ../../common/context#Context
+      mappers:
+        Image: ../../common/models/Image#ModelImage
+        User: ../../common/models/User#ModelUser
+    plugins:
+      - 'typescript'
+      - 'typescript-resolvers'

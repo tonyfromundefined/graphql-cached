@@ -1,0 +1,20 @@
+type Query {
+  images: [Image!]!
+  user(where: UserWhereInput!): User
+  users: [User!]!
+}
+
+input UserWhereInput {
+  id: String!
+}
+
+type User {
+  id: ID!
+  image: Image
+  nickname: String!
+}
+
+type Image {
+  id: ID!
+  url: String!
+}

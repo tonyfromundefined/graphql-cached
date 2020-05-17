@@ -12,20 +12,27 @@
   "scripts": {
     "build": "tsc",
     "postbuild": "rimraf ./lib/examples",
-    "dev": "tsc-watch --onCompilationComplete \"node lib/examples/with-nexus/index.js\"",
+    "dev": "tsc-watch",
+    "dev:with-graphql-tools": "tsc-watch --onCompilationComplete \"node lib/examples/with-graphql-tools/index.js\"",
+    "dev:with-nexus": "tsc-watch --onCompilationComplete \"node lib/examples/with-nexus/index.js\"",
+    "examples:with-graphql-tools:generate": "graphql-codegen --config ./src/examples/with-graphql-tools/codegen.yml",
     "postinstall": "link-module-alias",
     "prettier": "prettier . --write"
   },
   "dependencies": {
     "dataloader": "^2.0.0",
     "graphql": "^14.5.8",
-    "graphql-middleware": "^4.0.2",
     "memcached": "^2.2.2"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "^1.13.5",
+    "@graphql-codegen/typescript": "^1.13.5",
+    "@graphql-codegen/typescript-resolvers": "^1.13.5",
     "@nexus/schema": "^0.13.1",
     "@types/memcached": "^2.2.6",
     "apollo-server": "^2.13.1",
+    "graphql-middleware": "^4.0.2",
+    "graphql-tools": "^5.0.0",
     "link-module-alias": "^1.2.0",
     "prettier": "^2.0.5",
     "rimraf": "^3.0.2",
