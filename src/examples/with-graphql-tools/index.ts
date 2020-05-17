@@ -1,6 +1,6 @@
 import { ApolloServer } from 'apollo-server'
 import fs from 'fs'
-import { cached } from 'graphql-cached'
+import { cached } from '../../index'
 import { applyMiddleware } from 'graphql-middleware'
 import { makeExecutableSchema } from 'graphql-tools'
 import Memcached from 'memcached'
@@ -34,7 +34,7 @@ const cachedSchema = applyMiddleware(
       Query: {
         user: {
           lifetime: 10,
-          key(_parent: any, args: any) {
+          key(parent, args) {
             return JSON.stringify(args)
           },
         },

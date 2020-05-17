@@ -2,16 +2,15 @@ import DataLoader from 'dataloader'
 import { GraphQLResolveInfo } from 'graphql'
 import { promisify } from 'util'
 
-import { CacheField, Config, ResolversBase, T } from './types'
+import type { Config, T, ResolverLike, CacheField } from './types'
+import type { IMiddlewareTypeMap } from 'graphql-middleware'
 
 const DEFAULT_LIFETIME = 10
 
-export function cached<Context, Resolvers = ResolversBase>(
-  t: T<Required<Resolvers>>,
+export function cached<Context, Resolvers>(
+  t: T<Resolvers>,
   config: Config<Context>
-) {
-  const _t: any = t
-
+): IMiddlewareTypeMap<any, Context> {
   /**
    * Initialize cache getter(loader), setter
    */
@@ -28,17 +27,19 @@ export function cached<Context, Resolvers = ResolversBase>(
     }
   )
 
-  const resolveWithCache = async (
-    resolve: any,
-    parent: any,
-    args: any,
+  const resolveWithCache = async<Type, Parent, Arg>(
+    resolve: ResolverLike<Type, Parent, Arg, Context>,
+    parent: Parent,
+    args: Arg,
     context: Context,
     info: GraphQLResolveInfo
-  ) => {
-    const _typeName = info.parentType.toString()
-    const _fieldName = info.fieldName
+  ): Promise<Type> => {
+    const _typeName = info.parentType.toString() as keyof typeof t;
+    const _type = t[_typeName];
 
-    const _field: CacheField<any, any, any> = _t[_typeName][_fieldName]
+    const _fieldName = info.fieldName as keyof typeof _type;
+    const _field = _type[_fieldName] as CacheField<Type, Parent, Arg, Context>;
+
     const _fieldKey = 'key' in _field ? _field.key : _field
     const _fieldSerializer = 'serializer' in _field ? _field.serializer : null
     const _fieldLifetime = 'lifetime' in _field ? _field.lifetime : null
@@ -64,7 +65,7 @@ export function cached<Context, Resolvers = ResolversBase>(
      * Get cache from cache storage
      */
     config.beforeGet?.(key, null)
-    const cachedItem = (await cacheLoader.load(key)) || null
+    const cachedItem = (await cacheLoader.load(key) as unknown as Type) || null
     config.afterGet?.(key, cachedItem)
 
     if (cachedItem) {
@@ -104,12 +105,16 @@ export function cached<Context, Resolvers = ResolversBase>(
     }
   }
 
-  const resolvers: any = {}
+  const resolvers: any = {};
 
-  for (const typeName of Object.keys(_t)) {
-    resolvers[typeName] = {}
+  for (const typeName of Object.keys(t)) {
+    resolvers[typeName] = {};
 
-    for (const fieldName of Object.keys(_t[typeName])) {
+    const _type = t[typeName as keyof typeof t];
+    if (!_type) {
+      continue;
+    }
+    for (const fieldName of Object.keys(_type as NonNullable<typeof _type>)) {
       resolvers[typeName][fieldName] = resolveWithCache
     }
   }
