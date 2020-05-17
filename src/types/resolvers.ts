@@ -1,9 +1,8 @@
-export interface ResolversBase {
-  [typeName: string]:
-    | {
-        [fieldName: string]:
-          | ((parent: any, args: any, context: any, info: any) => any)
-          | undefined
-      }
-    | undefined
-}
+import type { GraphQLResolveInfo } from "graphql";
+
+export type ResolverLike<Type, Parent, Arg, Context = any> = (
+  root: Parent,
+  args: Arg,
+  context: Context,
+  info: GraphQLResolveInfo
+) => Type | Promise<Type>;

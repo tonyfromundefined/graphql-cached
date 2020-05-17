@@ -1,5 +1,5 @@
 import { ApolloServer } from 'apollo-server'
-import { cached } from 'graphql-cached'
+import { cached } from '../../index'
 import { applyMiddleware } from 'graphql-middleware'
 import Memcached from 'memcached'
 import path from 'path'
@@ -46,16 +46,20 @@ const cachedSchema = applyMiddleware(
   cached<Context, ResolversFromNexusGenFieldTypes<NexusGenFieldTypes>>(
     {
       Query: {
+        // @ts-ignore
         user: {
           lifetime: 10,
-          key(_parent: any, args: any) {
+          // @ts-ignore
+          key(_parent, args) {
             return JSON.stringify(args)
           },
         },
       },
       User: {
+        // @ts-ignore
         image: {
           lifetime: 1,
+          // @ts-ignore
           key(parent) {
             return parent.imageId
           },
