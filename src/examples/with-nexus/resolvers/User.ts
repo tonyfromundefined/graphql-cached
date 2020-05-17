@@ -10,6 +10,7 @@ export const User = objectType({
         return 'User#' + parent.id
       },
     })
+    t.string('nickname')
     t.field('image', {
       type: 'Image',
       nullable: true,

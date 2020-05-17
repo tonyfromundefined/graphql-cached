@@ -10,7 +10,9 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
-    "dev": "tsc-watch --onCompilationComplete \"node lib/example/index.js\"",
+    "build": "tsc",
+    "postbuild": "rimraf ./lib/examples",
+    "dev": "tsc-watch --onCompilationComplete \"node lib/examples/with-nexus/index.js\"",
     "postinstall": "link-module-alias",
     "prettier": "prettier . --write"
   },
@@ -26,6 +28,7 @@
     "apollo-server": "^2.13.1",
     "link-module-alias": "^1.2.0",
     "prettier": "^2.0.5",
+    "rimraf": "^3.0.2",
     "tsc-watch": "^4.2.5",
     "typescript": "^3.9.2"
   },

@@ -6,10 +6,14 @@ import path from 'path'
 
 import { FieldResolver, makeSchema } from '@nexus/schema'
 
+import { NexusGenFieldTypes } from './__generated__/nexus'
 import __root from './__root'
 import { Context } from './context'
 import * as resolvers from './resolvers'
-import { createNexusTypegenSources } from './utils'
+import {
+  createNexusTypegenSources,
+  ResolversFromNexusGenFieldTypes
+} from './utils'
 
 const memcached = new Memcached('localhost:11211')
 
@@ -22,8 +26,14 @@ const schema = makeSchema({
     resolvers,
   },
   outputs: {
-    schema: path.join(__root, './src/example/__generated__/schema.graphql'),
-    typegen: path.join(__root, './src/example/__generated__/nexus.d.ts'),
+    schema: path.join(
+      __root,
+      './src/examples/with-nexus/__generated__/schema.graphql'
+    ),
+    typegen: path.join(
+      __root,
+      './src/examples/with-nexus/__generated__/nexus.d.ts'
+    ),
   },
   typegenAutoConfig: {
     contextType: 'Context',
@@ -33,14 +43,7 @@ const schema = makeSchema({
 
 const cachedSchema = applyMiddleware(
   schema,
-  cached<{
-    Query?: {
-      user?: FieldResolver<'Query', 'user'>
-    }
-    User?: {
-      image?: FieldResolver<'User', 'image'>
-    }
-  }>(
+  cached<ResolversFromNexusGenFieldTypes<NexusGenFieldTypes>, Context>(
     {
       Query: {
         user: {
@@ -52,7 +55,7 @@ const cachedSchema = applyMiddleware(
       },
       User: {
         image: {
-          lifetime: 5,
+          lifetime: 1,
           key(parent) {
             return parent.imageId
           },
@@ -64,11 +67,8 @@ const cachedSchema = applyMiddleware(
       contextKey(context) {
         return 'v1.' + context.user?.role || 'Anonymous'
       },
-      logger: {
-        interval: 1000,
-      },
-      afterGet(key) {
-        console.log(key)
+      afterGet(key, data) {
+        console.log(key, data)
       },
     }
   )

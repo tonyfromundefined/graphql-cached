@@ -1,6 +1,6 @@
 import { arg, inputObjectType, queryType } from '@nexus/schema'
 
-import { USERS } from '../models'
+import { IMAGES, USERS } from '../models'
 
 export const Query = queryType({
   definition(t) {
@@ -32,9 +32,9 @@ export const Query = queryType({
     })
 
     t.list.field('images', {
-      type: 'User',
+      type: 'Image',
       resolve() {
-        return USERS
+        return IMAGES
       },
     })
   },

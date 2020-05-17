@@ -44,7 +44,7 @@ export interface NexusGenFieldTypes {
     url: string; // String!
   }
   Query: { // field return type
-    images: NexusGenRootTypes['User'][]; // [User!]!
+    images: NexusGenRootTypes['Image'][]; // [Image!]!
     ok: boolean; // Boolean!
     user: NexusGenRootTypes['User'] | null; // User
     users: NexusGenRootTypes['User'][]; // [User!]!
@@ -52,6 +52,7 @@ export interface NexusGenFieldTypes {
   User: { // field return type
     id: string; // ID!
     image: NexusGenRootTypes['Image'] | null; // Image
+    nickname: string; // String!
   }
 }
 

@@ -8,7 +8,7 @@ type Image {
 }
 
 type Query {
-  images: [User!]!
+  images: [Image!]!
   ok: Boolean!
   user(where: UserWhereInput!): User
   users: [User!]!
@@ -17,6 +17,7 @@ type Query {
 type User {
   id: ID!
   image: Image
+  nickname: String!
 }
 
 input UserWhereInput {

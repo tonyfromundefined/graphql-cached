@@ -1,124 +1,20 @@
 import DataLoader from 'dataloader'
 import { GraphQLResolveInfo } from 'graphql'
-import Memcached from 'memcached'
-import util from 'util'
+import { promisify } from 'util'
 
-const MINUTE = 1000 * 60
+import { CacheField, Config, ResolversBase, T } from './types'
 
-interface Resolvers {
-  [typename: string]: TypeResolver | undefined
-}
-type TypeResolver = {
-  [fieldName: string]: FieldResolver | undefined
-}
-type FieldResolver = (parent: any, args: any, context: any, info: any) => any
-
-type Types<R> = {
-  [TypeName in keyof R]?: {
-    [FieldName in keyof R[TypeName]]?: {
-      /**
-       * Create a cache key by combining parent, args, and context.
-       * @param {Object} parent
-       * @param {Object} args
-       * @param {Object} context
-       * @param {Object} info
-       */
-      key: (
-        parent: Parameters<R[TypeName][FieldName]>[0],
-        args: Parameters<R[TypeName][FieldName]>[1],
-        context: Parameters<R[TypeName][FieldName]>[2],
-        info: Parameters<R[TypeName][FieldName]>[3]
-      ) => string
-
-      /**
-       * How much time to keep the cache (seconds)
-       */
-      lifetime: number
-
-      /**
-       * Preprocess item before storing in cache and after fetching from cache
-       */
-      serializer?: {
-        /**
-         * Preprocess item before storing it in the cache
-         * @param {Object} item
-         * @returns {Object} Serialized item
-         */
-        serialize(item: any): any
-
-        /**
-         * Preprocess item after fetching from cache
-         * @param {Object} Serialized item
-         * @returns {Object} Item
-         */
-        deserialize(serializedItem: any): any
-      }
-    }
-  }
-}
-
-export interface CacheConfiguration {
-  /**
-   * Memcached instance to use as cache storage
-   */
-  memcached: Memcached
-
-  /**
-   * Set the namespace to attach to the front of the cache key based on context
-   */
-  contextKey: ContextKeyFunction<Context>
-
-  /**
-   * Triggered before cache fetching
-   * @param {string} key Cache key
-   */
-  beforeGet?: LifeCycleHook
-
-  /**
-   * Triggered after cache fetching
-   * @param {string} key Cache key
-   * @param {Object} [data] Cached item
-   */
-  afterGet?: LifeCycleHook
-
-  /**
-   * Triggered before cache storing
-   * @param {string} key Cache key
-   * @param {Object} [data] item
-   */
-  beforeSave?: LifeCycleHook
-
-  /**
-   * Triggered after cache storing
-   * @param {string} key Cache key
-   * @param {Object} [data] Serialized item
-   */
-  afterSave?: LifeCycleHook
-
-  /**
-   * Log hit ratio by 5 minutes
-   */
-  logger?:
-    | true
-    | {
-        interval: number
-      }
-}
-
-type ContextKeyFunction<Context> = (context: Context) => string
-type LifeCycleHook = (key: string, data: any | null) => void
-
-export function cached<R extends Resolvers>(
-  types: Types<Required<R>>,
-  config: CacheConfiguration
+export function cached<R extends ResolversBase, C>(
+  t: T<Required<R>>,
+  config: Config<C>
 ) {
+  const _t: any = t
+
   /**
    * Initialize cache getter(loader), setter
    */
-  const getMulti = util.promisify(
-    config.memcached.getMulti.bind(config.memcached)
-  )
-  const set = util.promisify(config.memcached.set.bind(config.memcached))
+  const getMulti = promisify(config.memcached.getMulti).bind(config.memcached)
+  const set = promisify(config.memcached.set).bind(config.memcached)
 
   const cacheLoader = new DataLoader<string, object | null>(
     async (keys) => {
@@ -130,51 +26,33 @@ export function cached<R extends Resolvers>(
     }
   )
 
-  /**
-   * Initialize cache hit ratio logger
-   */
-  let logger: HitRatioLogger | null
-
-  if (config.logger) {
-    logger = new HitRatioLogger()
-    let interval = 5 * MINUTE
-
-    if (typeof config.logger === 'object') {
-      interval = config.logger.interval
-    }
-
-    setInterval(() => {
-      logger?.log()
-    }, interval)
-  }
-
-  type _Types = typeof types
-  type _TypeName = keyof _Types
-  type _FieldName = keyof _Types[_TypeName]
-
-  async function cachedResolver(
+  const middleware = async (
     resolve: any,
     parent: any,
     args: any,
-    context: Context,
+    context: C,
     info: GraphQLResolveInfo
-  ) {
+  ) => {
+    const _typeName = info.parentType.toString()
+    const _fieldName = info.fieldName
+
+    const _field: CacheField<any, any, any> = _t[_typeName][_fieldName]
+    const _fieldKey = 'key' in _field ? _field.key : _field
+    const _fieldSerializer = 'serializer' in _field ? _field.serializer : null
+    const _fieldLifetime = 'lifetime' in _field ? _field.lifetime : null
+
     /**
      * Create cache key
+     * {contextKey}${typeName}${fieldName}${fieldKey}
      */
-    const typeName = info.parentType.toString() as _TypeName
-    const fieldName = info.fieldName as keyof _FieldName
-
-    const field: any = types[typeName]![fieldName]
-
     const contextKey = config.contextKey(context)
-    const fieldKey = field.key(parent, args, context, info)
+    const typeName = _typeName
+    const fieldName = _fieldName
+    const fieldKey = _fieldKey(parent, args, context, info)
 
-    let fullCacheKey = [contextKey, typeName + '.' + fieldName, fieldKey].join(
-      '$'
-    )
+    let key = [contextKey, typeName, fieldName, fieldKey].join('$')
 
-    if (fullCacheKey.length > 250) {
+    if (key.length > 250) {
       throw new TypeError(
         'TypeError: the cache key size in Memcached should be under 250 characters'
       )
@@ -183,102 +61,52 @@ export function cached<R extends Resolvers>(
     /**
      * Get cache from cache storage
      */
-    config.beforeGet?.(fullCacheKey, null)
-    const cachedItem = (await cacheLoader.load(fullCacheKey)) || null
-    config.afterGet?.(fullCacheKey, cachedItem)
+    config.beforeGet?.(key, null)
+    const cachedItem = (await cacheLoader.load(key)) || null
+    config.afterGet?.(key, cachedItem)
 
-    /**
-     * If cache hit, deserialize item and return it
-     */
-    if (cachedItem && field.serializer) {
-      logger?.hit()
-      return field.serializer.deserialize(cachedItem)
-    } else if (cachedItem) {
-      logger?.hit()
-      return cachedItem
+    if (cachedItem) {
+      /**
+       * If cache hit, deserialize item and return it
+       */
+      config.onHit?.(key, cachedItem)
+
+      return _fieldSerializer
+        ? _fieldSerializer.deserialize(cachedItem)
+        : cachedItem
     } else {
-      logger?.miss()
-    }
+      /**
+       * If cache miss, run `resolve` function and serialize it if serializer exists
+       */
+      config.onMiss?.(key, null)
 
-    /**
-     * If cache miss, run `resolve` function and serialize it if serializer exists
-     */
-    const item = await resolve(parent, args, context)
-    let serializedItem: object | undefined
+      const item = await resolve(parent, args, context)
+      let serializedItem: object | undefined
 
-    if (field.serializer) {
-      serializedItem = field.serializer.serialize(item)
-    }
+      if (_fieldSerializer) {
+        serializedItem = _fieldSerializer.serialize(item)
+      }
 
-    /**
-     * Save cache to cache storage
-     */
-    config.beforeSave?.(fullCacheKey, item)
-    await set(fullCacheKey, serializedItem || item, field.lifetime)
-    config.afterSave?.(fullCacheKey, serializedItem)
+      /**
+       * Save cache to cache storage
+       */
+      config.beforeSave?.(key, item)
+      await set(key, serializedItem || item, _fieldLifetime || 10)
+      config.afterSave?.(key, serializedItem)
 
-    return item
-  }
-
-  const cachedResolvers: {
-    [TypeName in _TypeName]-?: {
-      [FieldName in keyof _Types[_TypeName]]-?: typeof cachedResolver
-    }
-  } = {} as any
-
-  for (const typename of Object.keys(types) as Array<_TypeName>) {
-    if (!cachedResolvers[typename]) {
-      cachedResolvers[typename] = {} as any
-    }
-    for (const fieldName of Object.keys(types[typename]!) as Array<
-      keyof _Types[typeof typename]
-    >) {
-      cachedResolvers[typename][fieldName] = cachedResolver
+      return item
     }
   }
 
-  return cachedResolvers
-}
+  const middlewares: any = {}
 
-class HitRatioLogger {
-  private startedAt!: number
-  private hitCount!: number
-  private missCount!: number
+  for (const typeName of Object.keys(_t)) {
+    middlewares[typeName] = {}
 
-  constructor() {
-    this.initialize()
-  }
-
-  log() {
-    const total = this.hitCount + this.missCount
-
-    if (total === 0) {
-      log('There was no request from the beginning of the measurement.')
-    } else {
-      const _duration =
-        Math.floor(((Date.now() - this.startedAt) / MINUTE) * 10) / 10
-      const _hitRatio = Math.floor((this.hitCount / total) * 1000) / 10
-      log(`The cache hit ratio for ${_duration} minutes is ${_hitRatio}%`)
+    for (const fieldName of Object.keys(_t[typeName])) {
+      middlewares[typeName][fieldName] = middleware
     }
-
-    this.initialize()
   }
 
-  hit() {
-    this.hitCount += 1
-  }
-
-  miss() {
-    this.missCount += 1
-  }
-
-  private initialize() {
-    this.startedAt = Date.now()
-    this.hitCount = 0
-    this.missCount = 0
-  }
-}
-
-function log(message: string) {
-  console.log('Cache Log: ' + message)
+  return middlewares
 }
