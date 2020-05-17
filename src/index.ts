@@ -2,7 +2,9 @@ import DataLoader from 'dataloader'
 import { GraphQLResolveInfo } from 'graphql'
 import { promisify } from 'util'
 
-import { CacheField, Config, ResolversBase, T } from './types'
+import { CacheField, Config, T } from './types'
+
+const DEFAULT_LIFETIME = 10
 
 export function cached<R, C>(t: T<Required<R>>, config: Config<C>) {
   const _t: any = t
@@ -88,7 +90,7 @@ export function cached<R, C>(t: T<Required<R>>, config: Config<C>) {
        * Save cache to cache storage
        */
       config.beforeSave?.(key, item)
-      await set(key, serializedItem || item, _fieldLifetime || 10)
+      await set(key, serializedItem || item, _fieldLifetime || DEFAULT_LIFETIME)
       config.afterSave?.(key, serializedItem)
 
       return item
