@@ -1,11 +1,19 @@
 {
   "name": "graphql-cached",
-  "version": "1.0.0",
+  "version": "0.1.0",
+  "description": "Write a cache layer for each resolver in GraphQL Shield style.",
+  "keywords": [
+    "cache",
+    "graphql",
+    "graphql-middleware",
+    "memcached"
+  ],
   "repository": "https://github.com/tonyfromundefined/graphql-cached",
   "license": "MIT",
   "author": "tonyfromundefined <jeehyukwon@gmail.com>",
   "files": [
-    "/lib"
+    "/lib",
+    "README.md"
   ],
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
